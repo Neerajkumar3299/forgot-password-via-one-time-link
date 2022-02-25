@@ -2,10 +2,10 @@ var express=require("express")
 var app=express()
 const path=require("path")
 const jwt=require("jsonwebtoken")
-
+const nodemailer=require("nodemailer")
 
 //Variable 
-const port=8080
+const port1=8080
 
 //middleware
 app.use(express.json())
@@ -52,9 +52,35 @@ app.post("/forgot-password",function(req,res){
     let link=`http://localhost:8080/reset-password/${user.id}/${token}`
     
     // as of now i have used in console but it should n=be sent to registered email using gmail package
+    // Implement Node mailer
+    //create transporter 
+    var transporter=nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true, // use SSL
+        auth:{
+            user:"loveyoubaby587227@gmail.com",
+            pass:"baby@9565"
+        }
+    })
+    
+    //create option
+    var options={
+        from:"loveyoubaby587227@gmail.com",
+        to:"ny587227@gmail.com",
+        subject:"Reset your password",
+        text:link
+    }
+    transporter.sendMail(options,function(err,info){
+        if(err){
+            res.send(err)
+        }
+        else{
+            res.send("Mail has been sent to your registered email..."+info.response)
+        }
+    })
     console.log(link)
-
-    res.send("Email has been sent to registered email id...")
+    // res.send("link is send to registered email id")
 })
 
 //-------------------------------------API for reset password------------------
@@ -78,7 +104,7 @@ app.get("/reset-password/:id/:token",function(req,res){
         res.render("reset-password")
     }
     catch(err){
-        res.send(err)
+        res.send(err.message)
     }
 })
 app.post("/reset-password/:id/:token",function(req,res){
@@ -101,6 +127,6 @@ app.post("/reset-password/:id/:token",function(req,res){
         res.send(err)
     }
 })
-app.listen(port,(req,res)=>{
-    console.log(`Listening at http://localhost:${port}/`)
+app.listen(port1,(req,res)=>{
+    console.log(`Listening at http://localhost:${port1}/`)
 })
